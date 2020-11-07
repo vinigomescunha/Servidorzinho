@@ -1,0 +1,37 @@
+declare -A content
+memoria=`free -m | grep -v shared`;
+disco=`df -h --total`;
+sistema=`uname -rms`;
+if [ -f "/proc/uptime" ]; then
+  uptime=`cat /proc/uptime`
+  uptime=${uptime%%.*}
+  uptime="$(( uptime/60/60/24 )) days, $(( uptime/60/60%24 )) hours, $(( uptime/60%60 )) minutes, $(( uptime%60 )) seconds"
+else
+  uptime=""
+fi
+content=(
+['user']="`whoami`"  
+['hostname']="`hostname`" 
+['memoria.total']="`echo $memoria | awk '/Mem/ { print $2 }'`" 
+['memoria.used']="`echo $memoria | awk '/Mem/ { print $3 }'`" 
+['memoria.free']="`echo $memoria | awk '/Mem/ { print $4 }'`" 
+['memoria.available']="`echo $memoria | awk '/Mem/ { print $7 }'`" 
+['disco.total']="`df -h --total | awk '/total/ { print $2 }'`" 
+['disco.used']="`df -h --total | awk '/total/ { print $3 }'`" 
+['disco.free']="`df -h --total | awk '/total/ { print $4 }'`" 
+['disco.percentage']="`df -h --total | awk '/total/ { print $5 }'`" 
+['sistema.os']="`echo $sistema | awk '// { print $1 }'`" 
+['sistema.distro']="`python -c 'import platform;print platform.linux_distribution()[0] + " " +platform.linux_distribution()[1]'`" 
+['sistema.kernel_release']="`echo $sistema | awk '// { print $2 }'`" 
+['sistema.architeture']="`echo $sistema | awk '// { print $3 }'`" 
+['system_uptime']="`uptime | awk '// { print $3,$4 }' | cut -f1 -d,`" 
+['system_uptime_long']="$uptime" 
+['internal_ips']="`hostname -I`" 
+['mongod']="`[ "$(pidof mongod | wc -w)" -eq 1 ] && echo "Running" || echo "Not Running"`" 
+['redis']="`[ "$(lsof -i:6379)" ] && echo "Running" || echo "Not Running"`" 
+['name_servers']="|`cat /etc/resolv.conf | sed '1 d'| sed '/#/d' |sed ':a;N;$!ba;s/\n/ || /g'`|" 
+['cpu_usage']="`ps aux --sort=-pcpu,-pmem | head -n 10  | awk ' NR==1 { print "" } NR!=1 { print " CPU: " $3 "% " " Mem: " $4 "% " $1 " (" $2 " - " $11 " )"}'|sed '1d;:a;N;$!ba;s/\n/<br>/g'`" 
+)
+
+echo "$(timeout 10 echo "$(eval "Servidorzinho.serve_template '/templates/api/status.json'")")"
+unset content memoria disco uptime
