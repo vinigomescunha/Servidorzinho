@@ -1,0 +1,93 @@
+<div id="p2" class="mdl-progress mdl-js-progress mdl-progress__indeterminate"></div>
+<table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp">
+  <thead>
+    <tr id="statistics-head"></tr>
+  </thead>
+  <tbody id="statistics">
+    <tr>
+      <td colspan=2 class="mdl-data-table__cell--non-numeric mdl-typography--text-center">
+        <div style="text-align: center;">
+          <div class="mdl-spinner mdl-js-spinner is-active"></div>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<script>
+  function reloadStatistic(callback) {
+  if (!document.querySelector('#statistics')) return;
+  document.querySelector('#statistics').style.maxHeight = '500px';
+  document.querySelector('#statistics').style.overflow = 'auto';
+  document.querySelector('#statistics').style.border = '1px solid #999';
+  document.querySelector('#statistics').style.padding = '15px';
+  var jsonData = '';
+  var xhr = new XMLHttpRequest();
+  var url = "api/status.api";
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState == 4 && xhr.status == 200) {
+      appendBadge();
+      if (callback) {
+        callback();
+      }
+      jsonData = JSON.parse(xhr.responseText);
+      document.querySelector('#statistics').innerHTML = "";
+      for (var i in jsonData) {
+        if (typeof jsonData[i] === 'object') {
+          for (var j in jsonData[i]) {
+            appendStatistics('<b>' + i + ' : ' + j + '</b>', jsonData[i][j])
+          }
+        } else {
+          appendStatistics('<b>' + i + '</b>', jsonData[i])
+        }
+      }
+    }
+  };
+  xhr.open("GET", url, true);
+  xhr.send();
+}
+
+function appendStatistics(title, value) {
+  var tr = document.createElement('tr');
+  tr.className="custom-tr";
+  var td1 = document.createElement('td');
+  var td2 = document.createElement('td');
+  td1.className = 'mdl-data-table__cell--non-numeric custom-td';
+  td2.className = 'mdl-data-table__cell--non-numeric custom-td';
+  td1.innerHTML = title;
+  td2.innerHTML = value;
+  tr.appendChild(td1);
+  tr.appendChild(td2);
+  document.querySelector('#statistics').appendChild(tr);
+}
+
+function appendHeader() {
+  var th1 = document.createElement('th');
+  var th2 = document.createElement('th');
+  th1.className = 'mdl-data-table__cell--non-numeric';
+  th1.innerHTML = '<b>Campo</b>';
+  th2.className = 'mdl-data-table__cell--non-numeric';
+  th2.innerHTML = '<b>Valor</b> <span id="tt4" title="Atualizado a cada 3 segundos" class="mdl-badge" data-badge="1"></span>';
+  if (document.querySelector('#statistics-head')) {
+    document.querySelector('#statistics-head').appendChild(th1);
+    document.querySelector('#statistics-head').appendChild(th2);
+  }
+}
+
+function appendBadge() {
+  if(document.querySelector('[data-badge]')) {
+    document.querySelector('[data-badge]').dataset.badge=(parseInt(document.querySelector('[data-badge]').dataset.badge)+1);
+  }
+}
+reloadStatistic(appendHeader);
+window.setInterval(reloadStatistic, 3000);
+</script>
+<style>
+#statistics tr.custom-tr {
+  height: unset;
+}
+#statistics td.custom-td {
+  height: unset;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+</style>
