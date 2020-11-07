@@ -12,7 +12,7 @@ bash init-server.sh
 
 bash redis-client.sh - client command line : see credits
 
-bash redis-dump.sh - display all keys
+bash redis-dump.sh - display all keys : not complete
 
 ## Credits:
 
@@ -42,3 +42,16 @@ https://chartio.com/resources/tutorials/how-to-get-all-keys-in-redis/
 
 https://gist.github.com/iJackUA/7140412
 
+# TODO
+
+handle layout errors
+
+redis download to config vars
+
+step by step to explain redis download first, after switch on/off and how to execute commands by the "suporte" area
+
+i18n :)
+
+redis dump custom specific format
+
+redis restore custom specific format
