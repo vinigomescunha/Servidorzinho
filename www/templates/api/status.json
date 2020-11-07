@@ -1,0 +1,29 @@
+{
+  "Uso CPU": "${content['cpu_usage']}",
+  "Usuario": "${content['user']}",
+  "Hostname": "${content['hostname']}",
+  "Memoria": {
+    "Total": "${content['memoria.total']}M",
+    "Usado": "${content['memoria.used']}M",
+    "Livre": "${content['memoria.free']}M",
+    "Disponivel": "${content['memoria.available']}M"
+  },
+  "Disco": {
+    "Total": "${content['disco.total']}",
+    "Usado": "${content['disco.used']}",
+    "Livre": "${content['disco.free']}",
+    "Porcentagem": "${content['disco.percentage']}"
+  },
+  "Sistema": {
+    "OS": "${content['sistema.os']}",
+    "Kernel Release": "${content['sistema.kernel_release']}",
+    "Arquitetura": "${content['sistema.architeture']}",
+    "Distro": "${content['sistema.distro']}"
+  },
+  "Tempo de Atividade": "${content['system_uptime']}",
+  "Tempo de Atividade II": "${content['system_uptime_long']}",
+  "Ips Internos": "${content['internal_ips']}",
+  "MongoDB": "${content['mongod']}",
+  "Redis": "${content['redis']}",
+  "Name Servers": "${content['name_servers']}"
+}
