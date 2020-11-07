@@ -1,0 +1,17 @@
+
+case ${query['action']}  in
+  redis_download) foo() { 
+    [ "$(wget http://download.redis.io/releases/redis-4.0.9.tar.gz &> /dev/null;echo $?)" -eq 0 ] && echo "ok" || echo "error"
+  };;
+  redis_organize) foo() { 
+    [ -f redis-4.0.9.tar.gz ] && [ "$(rm -rf redis/ && tar xvfz redis-4.0.9.tar.gz  &> /dev/null && rm redis-4.0.9.tar.gz  &> /dev/null && mv redis-4.0.9/ redis/ && chmod -R 777 -f redis/ &> /dev/null;echo $?)" -eq 0 ] && echo "ok" || echo "error"
+  };;
+  redis_compile) foo() { 
+    timeout 1 [ "$(cd redis/ && make PREFIX=$PWD install &> /dev/null;echo $?)" -eq 0 ]  && echo "ok" || echo "error"
+  };;
+*) foo() { 
+    echo 'not found'; 
+  } ;;
+esac
+
+timeout 10 printf '{"result":"%s"}\n' "`foo`"
