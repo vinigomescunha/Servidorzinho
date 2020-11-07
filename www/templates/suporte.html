@@ -1,0 +1,259 @@
+<div class="demo-card-wide mdl-card mdl-shadow--2dp">
+  <div class="mdl-grid demo-content">
+    <div class="demo-cards mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-grid mdl-cell-12-col-desktop">
+      <div class="mdl-card__title mdl-card--expand mdl-color--blue-grey-900">
+        <h2 class="mdl-card__title-text">Instalar Redis</h2>
+        <div class="mdl-layout-spacer"></div>
+        <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" id="btn1">
+          <i class="material-icons">more_vert</i>
+        </button>
+        <ul class="mdl-menu mdl-js-menu mdl-menu--bottom-right" for="btn1">
+          <li class="mdl-menu__item show-modal-install">Instalar</li>
+          <li class="mdl-menu__item show-modal-commands">Analise</li>
+          <li class="mdl-menu__item" disabled>Deletar</li>
+        </ul>
+      </div>
+      <div class="mdl-card__supporting-text mdl-color-text--grey-600">
+        Redis é um armazenamento de estrutura de dados de chave-valor de código aberto e na memória.
+        <br>O Redis oferece um conjunto de estruturas versáteis de dados na memória que permite a fácil criação de várias aplicações
+        personalizadas.
+        <br>Os principais casos de uso do Redis incluem cache, gerenciamento de sessões, PUB/SUB e classificações.
+      </div>
+      <div class="mdl-card__actions mdl-card--border">
+        <a href="#" class="mdl-button mdl-js-button mdl-js-ripple-effect toRedisSite" data-upgraded=",MaterialButton,MaterialRipple">Comandos Basicos
+          <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple"></span>
+          </span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+<dialog class="mdl-dialog showModalInstall">
+  <div class="mdl-dialog__content">
+    <h4 class="mdl-typography--text-center mdl-color-text--blue-grey-400">
+      Instalar Redis
+    </h4>
+    Clique para confirmar a instalacao do Redis
+  </div>
+  <div id="install-loading" class="mdl-spinner mdl-spinner--single-color mdl-js-spinner" style="display:none"></div>
+  <div class="modal-install-status"></div>
+  <div class="mdl-dialog__actions mdl-dialog__actions--full-width">
+    <button type="button" class="mdl-button confirmInstall">Confirmar</button>
+    <button type="button" class="mdl-button close">${content[close]}</button>
+  </div>
+</dialog>
+<dialog class="mdl-dialog showModalCommands">
+  <div class="mdl-dialog__content">
+    <span class="mdl-typography--text-center mdl-color-text--blue-grey-400">
+      <b>Comandos Redis</b>
+    </span>
+    <input type="checkbox" id="redis-status">Ligado
+  </div>
+  <div id="command-loading" class="mdl-spinner mdl-spinner--single-color mdl-js-spinner" style="display:none"></div>
+  <textarea id="modal-command-status" placeholder="Resultado da consulta" cols="50" rows="5" class="modal-command-status mdl-textfield__input border display_textarea textarea_custom"
+    disabled></textarea>
+  <input type="text" id="input_command" cols="50" placeholder="Consulta aqui..." rows="5" class="mdl-textfield__input border textarea_custom"></input>
+  <div class="mdl-dialog__actions mdl-dialog__actions--full-width">
+    <button type="button" class="mdl-button confirmCommand">Enviar</button>
+    <button type="button" class="mdl-button close">${content[close]}</button>
+  </div>
+</dialog>
+<style>
+  .after-result {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .green {
+    color: green;
+  }
+
+  .red {
+    color: red;
+  }
+
+  .border {
+    border: 1px solid rgba(0, 0, 0, .14);
+  }
+
+  .display_textarea {
+    background: rgba(0, 0, 0, .8);
+    color: #ffffff;
+  }
+
+  .display_textarea:-moz-placeholder,
+  .display_textarea:-webkit-placeholder,
+  .display_textarea::placeholder {
+    color: red;
+  }
+
+  .textarea_custom {
+    padding: 14px;
+    width: calc( 100% - 28px);
+    border: 1px solid rgba(0, 0, 0, .8);
+  }
+</style>
+<script>
+  var showModalInstall = document.querySelector('.showModalInstall');
+  var showModalInstallButton = document.querySelector('.show-modal-install');
+  if (!showModalInstall.showModal) {
+    dialogPolyfill.registerDialog(showModalInstall);
+  }
+  showModalInstallButton.addEventListener('click', function () {
+    showModalInstall.showModal();
+  });
+  showModalInstall.querySelector('.close').addEventListener('click', function () {
+    afterInstallStatus('');
+    showModalInstall.close();
+  });
+
+  var showModalCommands = document.querySelector('.showModalCommands');
+  var showModalCommandsButton = document.querySelector('.show-modal-commands');
+  if (!showModalCommands.showModal) {
+    dialogPolyfill.registerDialog(showModalCommands);
+  }
+  showModalCommandsButton.addEventListener('click', function () {
+    makeRequest('GET', '/api/status.api', function (error, data) {
+      console.log(data)
+      if (data.Redis === 'Running') {
+        document.querySelector('#redis-status').checked = true;
+      } else {
+        document.querySelector('#redis-status').checked = false;
+      }
+    })
+    showModalCommands.showModal();
+  });
+
+  showModalCommands.querySelector('.close').addEventListener('click', function () {
+    afterInstallStatus('');
+    showModalCommands.close();
+  });
+  /**
+   * 
+   * function makeRequest(method, url) {
+       return new Promise(function (resolve, reject) {
+          var xhr = new XMLHttpRequest();
+          xhr.open(method, url);
+          xhr.onload = resolve;
+          xhr.onerror = reject;
+          xhr.send();
+        });
+      }
+    makeRequest('GET', 'http://localhost:8002/api/status.api')
+      .then(function (e) {
+        console.log(e.target.response);
+      }, function (e) {
+        console.error(e)
+      })
+      .catch(function(e){
+        console.error(e)
+      });
+  */
+  function makeRequest(method, url, done) {
+    var xhr = new XMLHttpRequest();
+    xhr.open(method, url);
+    xhr.onload = function () {
+      done(null, JSON.parse(xhr.response));
+    };
+    xhr.onerror = function () {
+      done(JSON.parse(xhr.response), null);
+    };
+    xhr.send();
+  }
+
+  function afterInstallStatus(status) {
+    var div = document.createElement('div');
+    div.innerHTML = status;
+    div.className = "after-result";
+    document.querySelector(".modal-install-status").appendChild(div);
+  }
+
+  function afterCommandStatus(status) {
+    var div = document.createElement('div');
+    div.innerHTML = (status ? status : '--nada encontrado--');
+    document.querySelector(".modal-command-status").value = div.innerText;
+  }
+
+  function statusLoading(display) {
+    if (display) {
+      document.querySelector('#install-loading').style.display = 'block';
+      document.querySelector('#install-loading').classList.add('is-active');
+      document.querySelector('.confirmInstall').setAttribute('disabled', true);
+
+    } else {
+      document.querySelector('#install-loading').style.display = 'none';
+      document.querySelector('#install-loading').classList.add('is-active');
+      document.querySelector('.confirmInstall').removeAttribute('disabled');
+    }
+  }
+
+  function createDownload() {
+    makeRequest('GET', 'api/manage.api?action=redis_download', function (err, data) {
+      if (data.result === 'ok' && !err) {
+        afterInstallStatus('Download terminado... <i class=" green material-icons">check_circle</i>');
+        createOrganize();
+      } else {
+        statusLoading(false);
+        afterInstallStatus('Erro ao realizar download. <i class=" red material-icons">error</i>');
+      }
+    });
+  }
+
+  function createOrganize() {
+    makeRequest('GET', 'api/manage.api?action=redis_organize', function (err, data) {
+      if (data.result === 'ok' && !err) {
+        afterInstallStatus('Organizando ambiente... <i class=" green material-icons">check_circle</i>');
+        createCompile();
+      } else {
+        statusLoading(false);
+        afterInstallStatus('Erro ao tentar organizar o ambiente. <i class=" red material-icons">error</i>');
+      }
+    });
+  }
+
+  function createCompile() {
+    makeRequest('GET', 'api/manage.api?action=redis_compile', function (err, data) {
+      statusLoading(false);
+      if (data.result === 'ok' && !err) {
+        afterInstallStatus('Compilacao terminada. <i class=" green material-icons">check_circle</i>');
+      } else {
+        afterInstallStatus('Erro ao tentar compilar o Redis. <i class=" red material-icons">error</i>');
+      }
+    });
+  }
+
+  document.querySelector('.confirmInstall').addEventListener('click', function () {
+    afterInstallStatus('');
+    statusLoading(true);
+    createDownload();
+  });
+
+  document.querySelector('.confirmCommand').addEventListener('click', function () {
+    var command = document.querySelector('#input_command').value;
+    document.querySelector(".modal-command-status").value = '';
+    if (command) {
+      makeRequest('GET', '/api/run.api?action=redis_command&command=' + command, function (error, data) {
+        afterCommandStatus(data.result);
+      });
+    }
+  });
+  // comandos basicos -> link redis commands
+  document.querySelector('.toRedisSite').addEventListener('click', function () {
+    window.open('https://redis.io/commands', '_blank');
+  });
+  // click no dialogo - radio - inicia e desliga redis
+  document.querySelector('#redis-status').addEventListener('change', function (event) {
+    if (document.querySelector('#redis-status').checked) {
+      makeRequest('GET', '/api/run.api?action=redis_init_server', function (error, data) {
+        console.log('Processo Liberado! Redis Desconectado', 'error', error, 'data', data);
+      });
+    } else {
+      makeRequest('GET', '/api/run.api?action=redis_stop_server', function (error, data) {});
+    }
+  });
+  // desabilito o evento de duplo click
+  document.querySelector('.confirmCommand').addEventListener("dblclick", function (event) {
+    event.preventDefault();
+  });
+</script>
