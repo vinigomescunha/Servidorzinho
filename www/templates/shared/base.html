@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="description" content="A front-end template that helps you build fast, modern mobile web apps.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <title>${content[htmltitle]}</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="assets/css/material.cyan-light_blue.min.css">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <script src="assets/js/material.min.js"></script>
+  <script async src="assets/js/custom.js"></script>
+</head>
+
+<body>
+  <dialog class="mdl-dialog showModalHelp">
+    <div class="mdl-dialog__content">
+      <h4 class="mdl-typography--text-center mdl-color-text--blue-grey-400">
+        ${content[subtitle]}
+      </h4>
+    </div>
+    <div class="mdl-dialog__actions mdl-dialog__actions--full-width">
+      <button type="button" class="mdl-button close">${content[close]}</button>
+    </div>
+  </dialog>
+  <div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
+    <header class="demo-header mdl-layout__header mdl-color--grey-100 mdl-color-text--grey-600">
+      <div class="mdl-layout__header-row">
+        <span class="mdl-layout-title">${content[title]}</span>
+        <div class="mdl-layout-spacer"></div>
+        <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" id="hdrbtn">
+          <i class="material-icons">more_vert</i>
+        </button>
+        <ul class="mdl-menu mdl-js-menu mdl-js-ripple-effect mdl-menu--bottom-right" for="hdrbtn">
+          <li class="mdl-menu__item show-modal-help">Sobre</li>
+        </ul>
+      </div>
+    </header>
+    <div class="demo-drawer mdl-layout__drawer mdl-color--blue-grey-900 mdl-color-text--blue-grey-50">
+      <header class="demo-drawer-header">
+        <div class="demo-avatar-dropdown">
+          <span id="user-mail">Bem Vindo(a)</span>
+          <div class="mdl-layout-spacer"></div>
+          <button id="accbtn" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+            <i class="material-icons" role="presentation">arrow_drop_down</i>
+            <span class="visuallyhidden">Accounts</span>
+          </button>
+          <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="accbtn">
+            <li class="mdl-menu__item">Esconder menu</li>
+          </ul>
+        </div>
+      </header>
+      <nav class="demo-navigation mdl-navigation mdl-color--blue-grey-800">
+        <a class="mdl-navigation__link" href="/">
+          <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">home</i>Home</a>
+        <a class="mdl-navigation__link" href="/suporte.sh">
+          <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">build</i>Suporte</a>
+        <a class="mdl-navigation__link" href="/updates.sh">
+          <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">flag</i>Updates</a>
+        <a class="mdl-navigation__link" href="/password.sh">
+          <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">lock</i>Senha</a>
+        <div class="mdl-layout-spacer"></div>
+        <a class="mdl-navigation__link" href="/help.sh">
+          <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">help_outline</i>
+          <span>Help</span>
+        </a>
+      </nav>
+    </div>
+    <main class="mdl-layout__content mdl-color--grey-100">
+      $(Servidorzinho.serve_template ${content[main]})
+    </main>
+  </div>
+</body>
+
+</html>
