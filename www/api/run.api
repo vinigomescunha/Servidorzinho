@@ -1,0 +1,20 @@
+
+case ${query['action']}  in
+  redis_init_server) foo() { 
+    echo "echo "$(eval "$PWD/redis/bin/redis-server $PWD/redis.conf &")")"
+  };;
+  redis_stop_server) foo() { 
+    eval "fuser -k 6379/tcp" 2>&1;
+    echo "ok"
+  };;
+  redis_command) foo() { 
+    # if is connected
+    cd $PWD/
+    [ ! -z "${query['command']}" ] && echo "${query['command']}"| sed 's/%20/ /g'| $PWD/redis/bin/redis-cli | awk ' // {  print $1 }' || echo "error"
+  };;
+*) foo() { 
+    echo 'not found'; 
+  } ;;
+esac
+
+timeout 10 printf '{"result":"%s"}\n' "`foo|sed ';:a;N;$!ba;s/\n/<br>/g'`"
